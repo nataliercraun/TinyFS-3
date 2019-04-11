@@ -1,5 +1,6 @@
 package com.master;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,8 +24,28 @@ public class Master {
 		if (parent == null) {
 			return FSReturnVals.SrcDirNotExistent;
 		}
-		directories.put(dirName, new tinyFsDir(parent, parent.getAbsPath() + "/" + dirName, dirName));
+		tinyFsDir newDir = new tinyFsDir(parent, parent.getAbsPath() + "/" + dirName, dirName); 
+		directories.put(dirName, newDir);
+		newDir.setParentDir(parent); // TODO: parent should be updated in directory constructor (somehow)
+		
 		return FSReturnVals.Success;
+	}
+	
+	public String[] ListDir(String tgt) {
+		tinyFsDir thisDir = directories.get(tgt); 
+		if (thisDir == null) {
+			return null; // TODO: 
+		}
+		List<String> content = thisDir.getContent(); 
+		if (content.size() == 0) {
+			return null; 
+		}
+		String[] contentArray = new String[content.size()]; 
+		for (int i = 0; i < content.size(); i++) {
+			contentArray[i] = content.get(i); 
+		}
+		
+		return contentArray; 
 	}
 	
 	public FSReturnVals deleteDir(String srcDir, String dirName) {

@@ -1,6 +1,17 @@
 package com.client;
+import com.master.*;
 
 public class ClientFS {
+	
+	private Master master; 
+	
+	public ClientFS(Master master) {
+		this.master = master; 
+	}
+	
+	public ClientFS() {
+		
+	}
 
 	public enum FSReturnVals {
 		DirExists, // Returned by CreateDir when directory exists

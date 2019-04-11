@@ -15,7 +15,7 @@ public class tinyFsDir {
 		this.parentDir = parentDir;
 		
 		//Add this to parents subDirs list
-		parentDir.subDirs.add(this);
+//		parentDir.subDirs.add(this); TODO: parent should be updated in directory constructor (somehow)
 		this.absPath = absPath;
 		this.dirName = dirName;
 		

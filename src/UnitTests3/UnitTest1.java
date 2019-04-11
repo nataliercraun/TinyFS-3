@@ -1,4 +1,5 @@
 package UnitTests3;
+import com.master.Master;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,7 +19,7 @@ public class UnitTest1 {
 	static final String TestName = "Unit Test 1: ";
 	
 	public static void main(String[] args) {
-		test1(new ClientFS());
+		test1(new ClientFS(new Master("./root")));
 	}
 	
 	public static void test1(ClientFS cfs){
