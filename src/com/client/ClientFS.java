@@ -38,7 +38,7 @@ public class ClientFS {
 	 * "CSCI485"), CreateDir("/Shahram/CSCI485/", "Lecture1")
 	 */
 	public FSReturnVals CreateDir(String src, String dirname) {
-		return null;
+		return master.createDir(src, dirname);
 	}
 
 	/**
@@ -49,7 +49,7 @@ public class ClientFS {
 	 * Example usage: DeleteDir("/Shahram/CSCI485/", "Lecture1")
 	 */
 	public FSReturnVals DeleteDir(String src, String dirname) {
-		return null;
+		return master.deleteDir(src, dirname);
 	}
 
 	/**
@@ -72,7 +72,8 @@ public class ClientFS {
 	 * Example usage: ListDir("/Shahram/CSCI485")
 	 */
 	public String[] ListDir(String tgt) {
-		return null;
+		
+		return master.ListDir(tgt);
 	}
 
 	/**

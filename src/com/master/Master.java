@@ -1,6 +1,7 @@
 package com.master;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,16 +12,19 @@ public class Master {
 	private tinyFsDir root;
 	private Map<String, tinyFsDir> directories;
 	
-	public Master(String rootPath) {
+	public Master() {
 		this.root = new tinyFsDir(null, "/", null);
 		directories = new HashMap<String, tinyFsDir>();
+		directories.put("/",root);
 	}
 	
 	public FSReturnVals createDir(String srcDir, String dirName) {
 		if (directories.get(dirName) != null) {
 			return FSReturnVals.DestDirExists;
 		}
-		tinyFsDir parent = directories.get(srcDir);
+		
+		tinyFsDir parent = getParent(srcDir);
+				//directories.get(srcDir);
 		if (parent == null) {
 			return FSReturnVals.SrcDirNotExistent;
 		}
@@ -32,7 +36,9 @@ public class Master {
 	}
 	
 	public String[] ListDir(String tgt) {
-		tinyFsDir thisDir = directories.get(tgt); 
+		
+		tinyFsDir thisDir = directories.get(getParent2(tgt));
+		
 		if (thisDir == null) {
 			return null; // TODO: 
 		}
@@ -75,5 +81,38 @@ public class Master {
 		return FSReturnVals.Success;
 	}
 	
+	private tinyFsDir getParent(String srcDir) { //TODO: not ours
+		if (srcDir.equals("/")) {
+			return root;
+		}
+		
+		String[] partsArr = srcDir.split("/");
+		
+		ArrayList<String> parts = new ArrayList<>(Arrays.asList(partsArr));
+		ArrayList<String> toRemove = new ArrayList<>();
+		for (String s : parts) {
+			if (s.equals("")) {
+				toRemove.add(s);
+			}
+		}
+		
+		for (int i = 0; i < toRemove.size(); i++) {
+			parts.remove(toRemove.get(i));
+		}
+		
+		return directories.get(parts.get(parts.size() - 1));
+	}
 	
+	private String getParent2(String srcDir) { //TODO: 
+		if (srcDir.equals("/")) {
+			return "/";
+		}
+		
+		String[] partsArr = srcDir.split("/");
+		
+		ArrayList<String> parts = new ArrayList<>(Arrays.asList(partsArr));
+	
+		
+		return parts.get(parts.size()-1);
+	}
 }

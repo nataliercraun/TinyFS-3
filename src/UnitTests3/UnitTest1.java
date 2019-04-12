@@ -19,7 +19,7 @@ public class UnitTest1 {
 	static final String TestName = "Unit Test 1: ";
 	
 	public static void main(String[] args) {
-		test1(new ClientFS(new Master("./root")));
+		test1(new ClientFS(new Master()));
 	}
 	
 	public static void test1(ClientFS cfs){
