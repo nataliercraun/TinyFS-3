@@ -13,6 +13,10 @@ public class tinyFsFile {
 		this.absPath = absPath;
 		handles = new ArrayList<String>();
 	}
+	public tinyFsFile(String name) {
+		this.name = name;
+		handles = new ArrayList<String>();
+	}
 	
 
 	/*** Setters and getters ***/

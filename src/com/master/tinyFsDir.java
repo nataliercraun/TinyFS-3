@@ -61,12 +61,15 @@ public class tinyFsDir {
 	 */
 	public List<String> getContent() {
 		List<String> content = new ArrayList<String>();
+		
 		for (int i = 0; i < files.size(); i++) {
 			content.add(files.get(i).getAbsPath());
 		}
 		for (int i = 0; i < subDirs.size(); i++) {
 			content.add(subDirs.get(i).getAbsPath());
+			System.out.println("added this: "+ subDirs.get(i).getAbsPath());
 		}
+		System.out.println("current directory file size: "+ subDirs.size());
 		return content;
 	}
 	
