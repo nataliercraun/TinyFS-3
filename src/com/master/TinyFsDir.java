@@ -2,6 +2,7 @@ package com.master;
 
 import com.client.ClientFS.FSReturnVals;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class TinyFsDir {
@@ -52,7 +53,7 @@ public class TinyFsDir {
 	
 	public void rename(String name) {
 		dirName = name;
-		absPath = parentDir.getAbsPath() + "/" + name;
+		absPath = parentDir.getAbsPath() + "/" + name; 
 	}
 	
 	/**

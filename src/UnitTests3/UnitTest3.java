@@ -2,6 +2,7 @@ package UnitTests3;
 
 import com.client.ClientFS;
 import com.client.ClientFS.FSReturnVals;
+import com.master.Master;
 
 /**
  * UnitTest3 for Part 3 of TinyFS
@@ -14,7 +15,7 @@ public class UnitTest3 {
 	static final String TestName = "Unit Test 3: ";
 
 	public static void main(String[] args) {
-		ClientFS cfs = new ClientFS();
+		ClientFS cfs = new ClientFS(new Master());
 		UnitTest2 ut2 = new UnitTest2();
 		ut2.test2(cfs);
 
@@ -22,7 +23,7 @@ public class UnitTest3 {
 		String dir1 = "ShahramGhandeharizadeh";
 		FSReturnVals fsrv = cfs.CreateDir("/" + dir1 + "/", "CSCI485");
 		if( fsrv != FSReturnVals.Success ){
-			System.out.println("Unit test 3 result: fail!");
+			System.out.println("Unit test 3 result: fail1");
     		return;
 		}
 		
@@ -30,7 +31,7 @@ public class UnitTest3 {
 		for(int i = 1; i <= N; i++){
 			fsrv = cfs.CreateFile("/" + dir1 + "/CSCI485/", "Lecture" + i);
 			if( fsrv != FSReturnVals.Success ){
-				System.out.println("Unit test 3 result: fail!");
+				System.out.println("Unit test 3 result: fail2");
 	    		return;
 			}
 		}
@@ -39,7 +40,7 @@ public class UnitTest3 {
 		for(int i = 1; i <= N; i++){
 			fsrv = cfs.DeleteFile("/" + dir1 + "/CSCI485/", "Lecture" + i);
 			if( fsrv != FSReturnVals.Success ){
-				System.out.println("Unit test 3 result: fail!");
+				System.out.println("Unit test 3 result: fail3");
 	    		return;
 			}
 		}
@@ -49,7 +50,7 @@ public class UnitTest3 {
 		for(int i = 1; i <= N; i++){
 			fsrv = cfs.CreateFile("/" + dir2 + "/2i/", "Lecture" + i);
 			if( fsrv != FSReturnVals.Success ){
-				System.out.println("Unit test 3 result: fail!");
+				System.out.println("Unit test 3 result: fail4");
 	    		return;
 			}
 		}
@@ -58,7 +59,7 @@ public class UnitTest3 {
 		for(int i = 1; i <= N; i++){
 			fsrv = cfs.DeleteFile("/" + dir2 + "/2i/", "Lecture" + i);
 			if( fsrv != FSReturnVals.Success ){
-				System.out.println("Unit test 3 result: fail!");
+				System.out.println("Unit test 3 result: fail5");
 	    		return;
 			}
 		}

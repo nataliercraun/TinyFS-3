@@ -118,14 +118,28 @@ public class Master {
 	
 	public FSReturnVals RenameDir(String src, String newName) {
 		
+		TinyFsDir srcDir = directories.get(src);
+		
 		if(directories.get(newName) != null) {
 			return FSReturnVals.DestDirExists;
 		} else {
-			directories.put(newName, directories.get(newName));
 			directories.remove(src); 
-			
+			directories.put(newName, srcDir);
+			srcDir.rename(getEndOfPath(newName));
 		}
 		return FSReturnVals.Success;
+	}
+	
+	private String getEndOfPath(String srcDir) { //TODO: 
+		if (srcDir.equals("/")) {
+			return "/";
+		}
+		
+		String[] partsArr = srcDir.split("/");
+		
+		ArrayList<String> parts = new ArrayList<>(Arrays.asList(partsArr));
+		
+		return parts.get(parts.size()-1);
 	}
 	
 }
