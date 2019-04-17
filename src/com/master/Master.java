@@ -36,6 +36,27 @@ public class Master {
 		return FSReturnVals.Success;	
 	}
 	
+	public FSReturnVals deleteFile(String tgt, String filename) {
+		TinyFsDir targetDir = directories.get(tgt.substring(0, tgt.length() - 1));
+		if (targetDir == null) {
+			return FSReturnVals.SrcDirNotExistent;
+		}
+		
+		TinyFsFile toDelete = null;
+		for (int i=0; i<targetDir.getFiles().size(); i++) {
+			if (targetDir.getFiles().get(i).getName().equals(filename)) {
+				toDelete = targetDir.getFiles().get(i);
+			}
+		}
+		
+		if (toDelete == null) {
+			return FSReturnVals.FileDoesNotExist;
+		}
+
+		targetDir.files.remove(toDelete);
+		return FSReturnVals.Success;	
+	}
+	
 	public FSReturnVals createDir(String srcDir, String dirName) {
 		String absPath = srcDir + dirName;
 		
