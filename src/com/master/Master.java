@@ -117,10 +117,8 @@ public class Master {
 	}
 	
 	public FSReturnVals RenameDir(String src, String newName) {
-	
-		TinyFsDir newDir = directories.get(newName);
 		
-		if(newDir != null) {
+		if(directories.get(newName) != null) {
 			return FSReturnVals.DestDirExists;
 		} else {
 			directories.put(newName, directories.get(newName));
