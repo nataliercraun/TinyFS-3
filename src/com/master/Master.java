@@ -19,7 +19,7 @@ public class Master {
 	}
 	
 	public FSReturnVals createFile(String tgt, String filename) {
-		TinyFsDir targetDir = directories.get(tgt);
+		TinyFsDir targetDir = directories.get(tgt.substring(0, tgt.length() - 1));
 		if (targetDir == null) {
 			return FSReturnVals.SrcDirNotExistent;
 		}
