@@ -110,7 +110,7 @@ public class Master {
 			return FSReturnVals.Success;
 		}
 		//TinyFsDir parent = directories.get(getEndOfPath(srcDir));
-		TinyFsDir parent = directories.get(srcDir.substring(0, srcDir.length() - 2));
+		TinyFsDir parent = directories.get(srcDir.substring(0, srcDir.length() - 1));
 		if (parent == null) {
 			return FSReturnVals.SrcDirNotExistent;
 		}
