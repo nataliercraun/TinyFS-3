@@ -27,7 +27,7 @@ public class UnitTest3 {
     		return;
 		}
 		
-		System.out.println(TestName + "CreateFile Lecture1/2/.../15 in /ShahramGhandeharizadeh/CSCI485");
+		System.out.println(TestName + "CreateFile Lecture1/2/.../15 in /ShahramGhandeharizadeh/CSCI485"); //problem spot for eclipse
 		for(int i = 1; i <= N; i++){
 			fsrv = cfs.CreateFile("/" + dir1 + "/CSCI485/", "Lecture" + i);
 			if( fsrv != FSReturnVals.Success ){
