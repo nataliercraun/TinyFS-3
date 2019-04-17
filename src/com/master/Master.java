@@ -33,8 +33,7 @@ public class Master {
 
 		toAdd = new TinyFsFile(filename);
 		targetDir.files.add(toAdd);
-		return FSReturnVals.Success;
-		
+		return FSReturnVals.Success;	
 	}
 	
 	public FSReturnVals createDir(String srcDir, String dirName) {
