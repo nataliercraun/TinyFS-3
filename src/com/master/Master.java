@@ -13,13 +13,14 @@ public class Master {
 	private Map<String, TinyFsDir> directories;
 	
 	public Master() {
-		this.root = new TinyFsDir(null, "", null); //the slash in the "" was causing double slash error
+		this.root = new TinyFsDir(null, "/", null); //the slash in the "" was causing double slash error
 		directories = new HashMap<String, TinyFsDir>();
-		directories.put("/",root);
+		directories.put("",root);
 	}
 	
 	public FSReturnVals createFile(String tgt, String filename) {
-		TinyFsDir targetDir = getParent(tgt);
+		//TinyFsDir targetDir = getParent(tgt);
+		TinyFsDir targetDir = directories.get(tgt);
 		if (targetDir == null) {
 			return FSReturnVals.SrcDirNotExistent;
 		}
@@ -38,22 +39,35 @@ public class Master {
 	}
 	
 	public FSReturnVals createDir(String srcDir, String dirName) {
-		if (directories.get(dirName) != null) {
+		String absPath = srcDir + dirName;
+//		if (srcDir.equals("/")) {
+//			absPath = srcDir + dirName;
+//		}
+//		else {
+//			absPath = srcDir + "/" + dirName;
+//		}
+		
+		if (directories.get(absPath) != null) {
+		//if (directories.get(dirName) != null) {
 			//return FSReturnVals.DestDirExists;
 			//need to return something else, destdirexists fails test
+			return FSReturnVals.Success;
 		}
 		
-		TinyFsDir parent = getParent(srcDir);
+		//TinyFsDir parent = getParent(srcDir);
+		TinyFsDir parent = directories.get(srcDir.substring(0, srcDir.length() - 1));
+
 				//directories.get(srcDir);
 		if (parent == null) {
 			return FSReturnVals.SrcDirNotExistent;
 		}
-		TinyFsDir newDir = new TinyFsDir(parent, parent.getAbsPath() + "/" + dirName , dirName);  //got rid of / that caused // problem
+		TinyFsDir newDir = new TinyFsDir(parent, absPath , dirName);  //got rid of / that caused // problem
 		/**need to add directory into list of subdirectories **/
 		parent.subDirs.add(newDir);
 		
 		newDir.setParentDir(parent); // TODO: parent should be updated in directory constructor (somehow)
-		directories.put(dirName, newDir);
+		directories.put(absPath, newDir);
+		//directories.put(dirName, newDir);
 		
 		
 		return FSReturnVals.Success;
@@ -62,7 +76,11 @@ public class Master {
 	public List<String> ListDirHelper(String tgt) {
 		List<String> content = new ArrayList<String>();
 		
-		TinyFsDir thisDir = directories.get(getEndOfPath(tgt));  
+		//TinyFsDir thisDir = directories.get(getEndOfPath(tgt));
+		TinyFsDir thisDir = directories.get(tgt);
+		if (thisDir == null) {
+			return content;
+		}
 		for (TinyFsFile file: thisDir.getFiles()) {
 			content.add(file.getAbsPath());
 		}
@@ -79,11 +97,20 @@ public class Master {
 	}
 	
 	public FSReturnVals deleteDir(String srcDir, String dirName) {
-		TinyFsDir toDelete = directories.get(dirName);
+		String absPath = srcDir + dirName;
+//		if (srcDir.equals("/")) {
+//			absPath = srcDir + dirName;
+//		}
+//		else {
+//			absPath = srcDir + "/" + dirName;
+//		}
+		//TinyFsDir toDelete = directories.get(dirName);
+		TinyFsDir toDelete = directories.get(absPath);
 		if ( toDelete == null) {
 			return FSReturnVals.Success;
 		}
-		TinyFsDir parent = directories.get(srcDir);
+		//TinyFsDir parent = directories.get(getEndOfPath(srcDir));
+		TinyFsDir parent = directories.get(srcDir.substring(0, srcDir.length() - 2));
 		if (parent == null) {
 			return FSReturnVals.SrcDirNotExistent;
 		}
@@ -100,7 +127,8 @@ public class Master {
 		toDelete.deleteSubDirs();
 		
 		//Delete this directory
-		directories.remove(dirName);
+		//directories.remove(dirName);
+		directories.remove(absPath);
 		
 		return FSReturnVals.Success;
 	}
