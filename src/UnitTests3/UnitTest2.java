@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 import com.client.ClientFS;
 import com.client.ClientFS.FSReturnVals;
+import com.master.Master;
 
 /**
  * UnitTest2 for Part 3 of TinyFS
@@ -16,7 +17,7 @@ public class UnitTest2 {
 	static final String TestName = "Unit Test 2: ";
 
 	public static void main(String[] args) {
-		test2(new ClientFS());
+		test2(new ClientFS(new Master()));
 	}
 	
 	public static void test2(ClientFS cfs){
@@ -31,7 +32,7 @@ public class UnitTest2 {
 		
 		boolean isExist = isDirExist(ret1, "/" + dir1+"/"+N);
 		if(isExist == true){
-			System.out.println("Unit test 2 result: fail!");
+			System.out.println("Unit test 2 result: fail1!");
     		return;
 		}
 		
@@ -46,7 +47,7 @@ public class UnitTest2 {
 		String[] ret2 = cfs.ListDir(lastSec);
 		isExist = isDirExist(ret2, lastSec + "/" + N);
 		if(isExist == true){
-			System.out.println("Unit test 2 result: fail!");
+			System.out.println("Unit test 2 result: fail2!");
     		return;
 		}
 		
@@ -55,7 +56,7 @@ public class UnitTest2 {
 		if(fsrv == FSReturnVals.DirNotEmpty){
 			System.out.println("Good! Detected " + dir1 + " exists.");
 		} else {
-			System.out.println("Unit test 2 result: fail!");
+			System.out.println("Unit test 2 result: fail3!");
     		return;
 		}
 		
@@ -64,7 +65,7 @@ public class UnitTest2 {
 		if(fsrv == FSReturnVals.DirNotEmpty){
 			System.out.println("Good!  Detected /" + dir2 + "/1/2 exists.");
 		} else {
-			System.out.println("Unit test 2 result: fail!");
+			System.out.println("Unit test 2 result: fail4!");
     		return;
 		}
 		
@@ -72,7 +73,7 @@ public class UnitTest2 {
 		for(int i = 1; i < N; i++){
 			fsrv = cfs.RenameDir("/" + dir1 + "/" + i, "/" + dir1 + "/" + i + "i");
 			if( fsrv != FSReturnVals.Success){
-				System.out.println("Unit test 2 result: fail!");
+				System.out.println("Unit test 2 result: fail5!");
 	    		return;
 			}
 		}
@@ -80,7 +81,7 @@ public class UnitTest2 {
 		System.out.println(TestName + "RenameDir(\"/Ghandeharizadeh\", \"/ShahramGhandeharizadeh\")");
 		fsrv = cfs.RenameDir("/" + dir2, "/ShahramGhandeharizadeh");
 		if( fsrv != FSReturnVals.Success ){
-			System.out.println("Unit test 2 result: fail!");
+			System.out.println("Unit test 2 result: fail6!");
     		return;
 		}
 		System.out.println(TestName + "Success!");

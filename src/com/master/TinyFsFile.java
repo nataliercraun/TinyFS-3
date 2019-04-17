@@ -2,18 +2,18 @@ package com.master;
 
 import java.util.ArrayList;
 
-public class tinyFsFile {
+public class TinyFsFile {
 
 	public String name;
 	public String absPath;
 	public ArrayList<String> handles;
 	
-	public tinyFsFile(String name, String absPath) {
+	public TinyFsFile(String name, String absPath) {
 		this.name = name;
 		this.absPath = absPath;
 		handles = new ArrayList<String>();
 	}
-	public tinyFsFile(String name) {
+	public TinyFsFile(String name) {
 		this.name = name;
 		handles = new ArrayList<String>();
 	}

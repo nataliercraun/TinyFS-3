@@ -4,14 +4,14 @@ import com.client.ClientFS.FSReturnVals;
 import java.util.ArrayList;
 import java.util.List;
 
-public class tinyFsDir {
-	public tinyFsDir parentDir;
+public class TinyFsDir {
+	public TinyFsDir parentDir;
 	public String absPath;
 	public String dirName;
-	public List<tinyFsDir> subDirs;
-	public List<tinyFsFile> files;
+	public List<TinyFsDir> subDirs;
+	public List<TinyFsFile> files;
 	
-	public tinyFsDir(tinyFsDir parentDir, String absPath, String dirName) {
+	public TinyFsDir(TinyFsDir parentDir, String absPath, String dirName) {
 		this.parentDir = parentDir;
 		
 		//Add this to parents subDirs list
@@ -19,8 +19,8 @@ public class tinyFsDir {
 		this.absPath = absPath;
 		this.dirName = dirName;
 		
-		subDirs = new ArrayList<tinyFsDir>();
-		files = new ArrayList<tinyFsFile>();
+		subDirs = new ArrayList<TinyFsDir>();
+		files = new ArrayList<TinyFsFile>();
 	}
 	
 	public FSReturnVals deleteFile(String fName) {
@@ -75,11 +75,11 @@ public class tinyFsDir {
 	
 	/***Getters and Setters***/
 	
-	public tinyFsDir getParentDir() {
+	public TinyFsDir getParentDir() {
 		return parentDir;
 	}
 
-	public void setParentDir(tinyFsDir parentDir) {
+	public void setParentDir(TinyFsDir parentDir) {
 		this.parentDir = parentDir;
 	}
 
@@ -99,19 +99,19 @@ public class tinyFsDir {
 		this.dirName = dirName;
 	}
 
-	public List<tinyFsDir> getSubDirs() {
+	public List<TinyFsDir> getSubDirs() {
 		return subDirs;
 	}
 
-	public void setSubDirs(List<tinyFsDir> subDirs) {
+	public void setSubDirs(List<TinyFsDir> subDirs) {
 		this.subDirs = subDirs;
 	}
 
-	public List<tinyFsFile> getFiles() {
+	public List<TinyFsFile> getFiles() {
 		return files;
 	}
 
-	public void setFiles(List<tinyFsFile> files) {
+	public void setFiles(List<TinyFsFile> files) {
 		this.files = files;
 	}
 	
