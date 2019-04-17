@@ -16,7 +16,7 @@ public class UnitTest3 {
 	public static void main(String[] args) {
 		ClientFS cfs = new ClientFS();
 		UnitTest2 ut2 = new UnitTest2();
-		ut2.test2(cfs);
+		//ut2.test2(cfs);
 
 		System.out.println(TestName + "CreateDir /ShahramGhandeharizadeh/CSCI485");
 		String dir1 = "ShahramGhandeharizadeh";

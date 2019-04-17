@@ -116,4 +116,18 @@ public class Master {
 		return FSReturnVals.Success;
 	}
 	
+	public FSReturnVals RenameDir(String src, String newName) {
+	
+		TinyFsDir newDir = directories.get(newName);
+		
+		if(newDir != null) {
+			return FSReturnVals.DestDirExists;
+		} else {
+			directories.put(newName, directories.get(newName));
+			directories.remove(src); 
+			
+		}
+		return FSReturnVals.Success;
+	}
+	
 }
