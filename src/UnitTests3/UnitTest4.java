@@ -22,15 +22,15 @@ public class UnitTest4 {
 	
 	public static void main(String[] args) {
 		String dir1 = "Shahram";
-		ClientFS cfs = new ClientFS();
+		ClientFS cfs = new ClientFS(new Master());
 		FSReturnVals fsrv = cfs.CreateDir("/", dir1);
 		if ( fsrv != FSReturnVals.Success ){
-			System.out.println("Unit test 4 result: fail!");
+			System.out.println("Unit test 4 result: fail1!");
     		return;
 		}
 		fsrv = cfs.CreateFile("/" + dir1 + "/", "emp");
 		if( fsrv != FSReturnVals.Success ){
-			System.out.println("Unit test 4 result: fail!");
+			System.out.println("Unit test 4 result: fail2!");
     		return;
 		}
 		//get the file handle first
@@ -86,14 +86,14 @@ public class UnitTest4 {
 		for(int i = 0; i < vect.size(); i++){
 			fsrv = crec.DeleteRecord(fh, vect.get(i));
 			if(fsrv != FSReturnVals.Success){
-				System.out.println("Unit test 4 result: failed to delete the record!");
+				System.out.println("Unit test 4 result: failed to delete the record!3");
 				return;
 			}
 		}
 		
 		fsrv = cfs.CloseFile(fh);
 		if(cntr != NumRecs){
-			System.out.println("Unit test 4 result: fail!");
+			System.out.println("Unit test 4 result: fail!4");
     		return;
 		}
 		
@@ -110,7 +110,7 @@ public class UnitTest4 {
 				int value = ((head[0] & 0xFF) << 24) | ((head[1] & 0xFF) << 16)
 				        | ((head[2] & 0xFF) << 8) | (head[3] & 0xFF);
 				if(value % 2 != 0){
-					System.out.println("Unit test 4 result: fail!  Found an odd numbered record with value " + value + ".");
+					System.out.println("Unit test 4 result: fail!5  Found an odd numbered record with value " + value + ".");
 		    		return;
 				}
 				r1 = r2;
