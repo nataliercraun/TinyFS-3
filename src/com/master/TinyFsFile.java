@@ -6,16 +6,16 @@ public class TinyFsFile {
 
 	public String name;
 	public String absPath;
-	public ArrayList<String> handles;
+	public ArrayList<String> chunkHandles;
 	
 	public TinyFsFile(String name, String absPath) {
 		this.name = name;
 		this.absPath = absPath;
-		handles = new ArrayList<String>();
+		chunkHandles = new ArrayList<String>();
 	}
 	public TinyFsFile(String name) {
 		this.name = name;
-		handles = new ArrayList<String>();
+		chunkHandles = new ArrayList<String>();
 	}
 	
 
@@ -36,12 +36,12 @@ public class TinyFsFile {
 		this.absPath = absPath;
 	}
 	
-	public ArrayList<String> getHandles() {
-		return handles;
+	public ArrayList<String> getChunkHandles() {
+		return chunkHandles;
 	}
 
-	public void setHandles(ArrayList<String> handles) {
-		this.handles = handles;
+	public void setChunkHandles(ArrayList<String> handles) {
+		this.chunkHandles = handles;
 	}
 	
 }
