@@ -9,6 +9,7 @@ import com.client.ClientRec;
 import com.client.FileHandle;
 import com.client.RID;
 import com.client.TinyRec;
+import com.master.Master;
 
 /**
  * UnitTest4 for Part 3 of TinyFS
