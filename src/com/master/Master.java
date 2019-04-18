@@ -14,17 +14,20 @@ public class Master {
 	private Map<String, TinyFsFile> files;
 	
 	public Master() {
+		files = new HashMap<String, TinyFsFile>();
 		this.root = new TinyFsDir(null, "/", null);
 		directories = new HashMap<String, TinyFsDir>();
 		directories.put("",root);
+		
 	}
 	
 	public FSReturnVals createFile(String tgt, String filename) {
+
 		TinyFsDir targetDir = directories.get(tgt.substring(0, tgt.length() - 1));
 		if (targetDir == null) {
 			return FSReturnVals.SrcDirNotExistent;
 		}
-		
+
 		TinyFsFile toAdd = null;
 		for (int i=0; i<targetDir.getFiles().size(); i++) {
 			if (targetDir.getFiles().get(i).getName().equals(filename)) {
@@ -33,10 +36,13 @@ public class Master {
 		}
 
 		toAdd = new TinyFsFile(filename);
+		System.out.println("toadd" + toAdd.name);
 		targetDir.files.add(toAdd);
-		
+
 		//Adding file to files map in master
 		String absPath = tgt + filename;
+		System.out.println("abs path: " + absPath);
+
 		files.put(absPath, toAdd);
 		
 		return FSReturnVals.Success;	
