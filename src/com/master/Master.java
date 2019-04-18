@@ -11,6 +11,7 @@ import com.client.ClientFS.FSReturnVals;
 public class Master {
 	private TinyFsDir root;
 	private Map<String, TinyFsDir> directories;
+	private Map<String, TinyFsFile> files;
 	
 	public Master() {
 		this.root = new TinyFsDir(null, "/", null);
@@ -33,6 +34,11 @@ public class Master {
 
 		toAdd = new TinyFsFile(filename);
 		targetDir.files.add(toAdd);
+		
+		//Adding file to files map in master
+		String absPath = tgt + filename;
+		files.put(absPath, toAdd);
+		
 		return FSReturnVals.Success;	
 	}
 	
@@ -54,6 +60,10 @@ public class Master {
 		}
 
 		targetDir.files.remove(toDelete);
+		
+		//Removing file from files map in master
+		String absPath = tgt + filename;
+		files.remove(absPath);
 		return FSReturnVals.Success;	
 	}
 	
@@ -148,6 +158,14 @@ public class Master {
 			srcDir.rename(getEndOfPath(newName));
 		}
 		return FSReturnVals.Success;
+	}
+	
+	public List<String> openFile(String filePath) {
+		TinyFsFile file = files.get(filePath);
+		if (file == null) {
+			return null;
+		}
+		return file.getChunkHandles();
 	}
 	
 	private String getEndOfPath(String srcDir) { //TODO: 
