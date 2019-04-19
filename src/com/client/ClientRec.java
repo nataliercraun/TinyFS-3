@@ -1,11 +1,17 @@
 package com.client;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
+import java.util.List;
 
 import com.client.ClientFS.FSReturnVals;
 
 public class ClientRec {
 
+	static final int MAX_CHUNK_SIZE = 4096;
+	
 	/**
 	 * Appends a record to the open file as specified by ofh Returns BadHandle
 	 * if ofh is invalid Returns BadRecID if the specified RID is not null
@@ -15,7 +21,83 @@ public class ClientRec {
 	 * Example usage: AppendRecord(FH1, obama, RecID1)
 	 */
 	public FSReturnVals AppendRecord(FileHandle ofh, byte[] payload, RID RecordID) {
-		return null;
+		//Get last chunk in file
+		List<String> chunkHandles = ofh.getHandles();
+		
+		if (chunkHandles.size() == 0) {
+			//TODO: create new chunk
+			//return FSReturnVals.
+		}
+		String lastChunkHandle = chunkHandles.get(chunkHandles.size()-1);
+		int numberRecords = getNumberRecords(lastChunkHandle);
+		
+		int offsetLastRecord = getOffsetOfRecord(lastChunkHandle, numberRecords);
+		
+		if (payload.length + offsetLastRecord + 4*(numberRecords+2) > MAX_CHUNK_SIZE) {
+			//TODO: not enough space create a new chunk
+		}
+		
+		byte[] newRecordNumber = ByteBuffer.allocate(4).putInt(numberRecords + 1).array();
+		byte[] newRecordOffset = ByteBuffer.allocate(4).putInt(payload.length+offsetLastRecord).array();
+		
+		RandomAccessFile raf = null;
+		try {
+			raf = new RandomAccessFile(lastChunkHandle, "rw");
+		} catch(FileNotFoundException fnfe) {
+			fnfe.printStackTrace();
+		}
+		try {
+			raf.seek(0);
+			raf.write(newRecordNumber, 0, 4);
+			raf.seek(offsetLastRecord);
+			raf.write(payload, 0, payload.length);
+			raf.seek(MAX_CHUNK_SIZE-4*(numberRecords+1));
+			raf.write(newRecordOffset, 0, 4);
+			raf.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return FSReturnVals.Success;
+	}
+	
+	private int getOffsetOfRecord(String chunkHandle, int recordNumber) {
+		RandomAccessFile raf = null;
+		try {
+			raf = new RandomAccessFile(chunkHandle,"rw");
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		byte[] data = new byte[4];
+		try {
+			raf.seek(MAX_CHUNK_SIZE - 4*(recordNumber));
+			raf.read(data, 0, 4);
+		} catch (IOException ioe){
+			ioe.printStackTrace();
+		}
+		int offset = ByteBuffer.wrap(data).getInt();
+		return offset;
+	}
+	
+	//Helper function to get number of records in a chunk
+	private int getNumberRecords(String chunkHandle) {
+		RandomAccessFile raf = null;
+		try {
+			raf = new RandomAccessFile(chunkHandle, "r");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		byte[] data = new byte[4];
+		try {
+			raf.seek(0);
+			raf.read(data, 0, 4);
+			raf.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		int numberRecords = ByteBuffer.wrap(data).getInt();
+		return numberRecords;
 	}
 
 	/**
