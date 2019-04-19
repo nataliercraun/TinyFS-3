@@ -25,8 +25,7 @@ public class ClientRec {
 		List<String> chunkHandles = ofh.getHandles();
 		
 		if (chunkHandles.size() == 0) {
-			//TODO: create new chunk
-			//return FSReturnVals.
+			return appendNewChunk(ofh, payload, RecordID);
 		}
 		String lastChunkHandle = chunkHandles.get(chunkHandles.size()-1);
 		int numberRecords = getNumberRecords(lastChunkHandle);
@@ -34,7 +33,7 @@ public class ClientRec {
 		int offsetLastRecord = getOffsetOfRecord(lastChunkHandle, numberRecords);
 		
 		if (payload.length + offsetLastRecord + 4*(numberRecords+2) > MAX_CHUNK_SIZE) {
-			//TODO: not enough space create a new chunk
+			return appendNewChunk(ofh, payload, RecordID);
 		}
 		
 		byte[] newRecordNumber = ByteBuffer.allocate(4).putInt(numberRecords + 1).array();
@@ -53,6 +52,42 @@ public class ClientRec {
 			raf.write(payload, 0, payload.length);
 			raf.seek(MAX_CHUNK_SIZE-4*(numberRecords+1));
 			raf.write(newRecordOffset, 0, 4);
+			raf.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return FSReturnVals.Success;
+	}
+	
+	private FSReturnVals appendNewChunk(FileHandle ofh, byte[] payload, RID RecordID) {
+		if (payload.length > (MAX_CHUNK_SIZE-8)) {
+			return FSReturnVals.RecordTooLong;
+		}
+		
+		String newChunkHandle = ofh.getFP() + ofh.getHandles().size();
+		ofh.chunkHandles.add(newChunkHandle);
+		
+		RandomAccessFile raf = null;
+		try {
+			raf = new RandomAccessFile(newChunkHandle,"rw");
+			raf.setLength((long) MAX_CHUNK_SIZE);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException ioe) {
+			ioe.printStackTrace();
+		}
+		
+		byte[] numberRecords = ByteBuffer.allocate(4).putInt(1).array();
+		byte[] recordOffset = ByteBuffer.allocate(4).putInt(4+payload.length).array();
+		
+		try {
+			raf.seek(0);
+			raf.write(numberRecords, 0, 4);
+			raf.seek(4);
+			raf.write(payload, 0, payload.length);
+			raf.seek(MAX_CHUNK_SIZE-4);
+			raf.write(recordOffset, 0, 4);
 			raf.close();
 		} catch (IOException e) {
 			e.printStackTrace();
