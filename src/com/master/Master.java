@@ -7,14 +7,17 @@ import java.util.List;
 import java.util.Map;
 
 import com.client.ClientFS.FSReturnVals;
+import com.client.FileHandle;
 
 public class Master {
 	private TinyFsDir root;
 	private Map<String, TinyFsDir> directories;
 	private Map<String, TinyFsFile> files;
+	private Map<String, FileHandle> fileHandles; //maps from abs path to file handle
 	
 	public Master() {
 		files = new HashMap<String, TinyFsFile>();
+		fileHandles = new HashMap<String, FileHandle>();
 		this.root = new TinyFsDir(null, "/", null);
 		directories = new HashMap<String, TinyFsDir>();
 		directories.put("",root);
@@ -29,12 +32,13 @@ public class Master {
 		}
 
 		TinyFsFile toAdd = null;
+		FileHandle toAdd2 = null; //for the file handle data structure
 		for (int i=0; i<targetDir.getFiles().size(); i++) {
 			if (targetDir.getFiles().get(i).getName().equals(filename)) {
 				return FSReturnVals.FileExists;
 			}
 		}
-
+		
 		toAdd = new TinyFsFile(filename);
 		System.out.println("toadd" + toAdd.name);
 		targetDir.files.add(toAdd);
@@ -42,8 +46,11 @@ public class Master {
 		//Adding file to files map in master
 		String absPath = tgt + filename;
 		System.out.println("abs path: " + absPath);
+		
+		toAdd2.setFP(absPath); //adding abspath to Filehandle
 
 		files.put(absPath, toAdd);
+		fileHandles.put(absPath, toAdd2); //adding filehandle into filehandle map
 		
 		return FSReturnVals.Success;	
 	}
@@ -172,6 +179,20 @@ public class Master {
 			return null;
 		}
 		return file.getChunkHandles();
+	}
+	public FSReturnVals CloseFile(FileHandle fh) {
+		FileHandle curr_fh;
+		String pathOfFH = fh.getFP();
+		//parse to get x and y in /x/y 
+		if(files.containsKey(pathOfFH)) {
+			curr_fh = fileHandles.get(pathOfFH);
+			if(curr_fh!=null) {
+				curr_fh.setOpen(false);
+				return FSReturnVals.Success;
+			}
+			return FSReturnVals.BadHandle;
+		}
+		return FSReturnVals.BadHandle;
 	}
 	
 	private String getEndOfPath(String srcDir) { //TODO: 
