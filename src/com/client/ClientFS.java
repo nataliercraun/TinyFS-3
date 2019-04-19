@@ -1,5 +1,7 @@
 package com.client;
-import com.master.*;
+import java.util.List;
+
+import com.master.Master;
 
 public class ClientFS {
 	
@@ -106,7 +108,14 @@ public class ClientFS {
 	 * Example usage: OpenFile("/Shahram/CSCI485/Lecture1/Intro.pptx", FH1)
 	 */
 	public FSReturnVals OpenFile(String FilePath, FileHandle ofh) {
-		return null;
+		List<String> chunks = master.openFile(FilePath); //master function returns null if file doesnt exist
+		
+		if (chunks == null) {
+			return FSReturnVals.FileDoesNotExist;
+		}
+		ofh.setHandles(chunks);
+		
+		return FSReturnVals.Success;
 	}
 
 	/**

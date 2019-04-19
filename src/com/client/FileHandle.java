@@ -27,11 +27,14 @@ public class FileHandle {
 	}
 	
 	
-	public void setHandles(List<String> fileChunks) {
-		this.chunkHandles = fileChunks;
-	}
+	
 	
 	public List<String> getHandles() {
 		return chunkHandles;
+	}
+
+	public void setHandles(List<String> chunks) {
+		this.chunkHandles = chunks;
+		
 	}
 }
