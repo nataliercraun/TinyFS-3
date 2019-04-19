@@ -114,6 +114,7 @@ public class ClientFS {
 			return FSReturnVals.FileDoesNotExist;
 		}
 		ofh.setHandles(chunks);
+		ofh.setOpen(true);
 		
 		return FSReturnVals.Success;
 	}

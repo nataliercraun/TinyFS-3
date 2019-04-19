@@ -9,6 +9,7 @@ public class FileHandle {
 	
 	String filepath;
 	List<String> chunkHandles;
+	boolean open;
 	
 	public FileHandle() {
 		chunkHandles = new ArrayList<String>();
@@ -26,9 +27,6 @@ public class FileHandle {
 		return this.filepath;
 	}
 	
-	
-	
-	
 	public List<String> getHandles() {
 		return chunkHandles;
 	}
@@ -36,5 +34,9 @@ public class FileHandle {
 	public void setHandles(List<String> chunks) {
 		this.chunkHandles = chunks;
 		
+	}
+	
+	public void setOpen(boolean open) {
+		this.open = open;
 	}
 }
