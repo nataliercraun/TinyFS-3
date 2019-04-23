@@ -195,7 +195,67 @@ public class ClientRec {
 	 * Example usage: ReadFirstRecord(FH1, tinyRec)
 	 */
 	public FSReturnVals ReadFirstRecord(FileHandle ofh, TinyRec rec){
-		return null;
+		//TODO:check for badhandle
+		
+		String firstChunkHandle = "";
+		// get the right chunkhandle
+		if (ofh.getHandles().size() > 0) {
+			firstChunkHandle = ofh.getHandles().get(0);
+		} else {
+			// file is empty 
+			return FSReturnVals.RecDoesNotExist;
+		}
+				
+		RandomAccessFile raf = null;
+		byte[] payload = null;
+		
+		try {
+			raf = new RandomAccessFile(firstChunkHandle, "rw");
+		} catch(FileNotFoundException fnfe) {
+			fnfe.printStackTrace();
+		}
+		try {
+			
+			// Calculate payload length 
+			byte[] endOfP1 = new byte[4];
+			raf.seek(MAX_CHUNK_SIZE-4);
+			raf.read(endOfP1, 0, 4);
+			
+			int endofpayloadOneInt = ByteBuffer.wrap(endOfP1).getInt();
+			
+			// Check if record has been deleted 
+			if (endofpayloadOneInt < 0) {
+				// Call helper function with filehandle, chunkhandle, index (for RID), and record
+				return ReadNextRecordHelper(ofh, firstChunkHandle, 0, rec);
+			}
+			
+			// Subtract the 4 bytes that store the # of records 
+			int payloadLength = endofpayloadOneInt - 4; 
+			
+			payload = new byte[payloadLength];
+			
+			// Seek to end of the 4 bytes that store the # of records 
+			raf.seek(4);
+			
+			// Read payload 
+			raf.read(payload, 0, payloadLength);
+			
+			raf.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		// Construct RID w/ index of 0 and assign it to the record 
+		rec.setPayload(payload);
+		RID rid = new RID(firstChunkHandle, 0);
+		rec.setRID(rid);
+				
+		return FSReturnVals.Success;
+	}
+	
+	public FSReturnVals ReadNextRecordHelper(FileHandle ofh, String chunkHandle, Integer index, TinyRec rec) {
+		RID rid = new RID(chunkHandle, index);
+		return ReadNextRecord(ofh, rid, rec);
 	}
 
 	/**
@@ -327,7 +387,6 @@ public class ClientRec {
 			} catch (IOException ioe) {
 				ioe.printStackTrace();
 			}
-			
 			
 			return FSReturnVals.Success;
 			
