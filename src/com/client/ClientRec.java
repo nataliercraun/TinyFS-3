@@ -296,7 +296,42 @@ public class ClientRec {
 	 * recn-1, tinyRec2) 3. ReadPrevRecord(FH1, recn-2, tinyRec3)
 	 */
 	public FSReturnVals ReadPrevRecord(FileHandle ofh, RID pivot, TinyRec rec){
-		return null;
+		if (pivot.ChunkHandle == ofh.getHandles().get(0) && (pivot.index == 0)) {
+			return FSReturnVals.RecDoesNotExist;
+		}  else {
+			// Calculate payload length 
+			RandomAccessFile raf = null;
+			
+			int offsetPrev = getOffsetOfRecord(pivot.ChunkHandle, pivot.index); //index+1 would be location of pivot
+			int offsetPrevPrev = getOffsetOfRecord(pivot.ChunkHandle, pivot.index-1);
+			
+			if (offsetPrevPrev < 4) {
+				return FSReturnVals.RecDoesNotExist;
+			} 
+			
+			if (offsetPrev < 0) {
+				pivot.index -= 1; 
+				return ReadPrevRecord(ofh, pivot, rec);
+			}
+			
+			int lengthPayload = offsetPrev - offsetPrevPrev;
+			byte[] payload = new byte[lengthPayload]; 
+			
+			
+			try {
+				raf = new RandomAccessFile(pivot.ChunkHandle, "rw");
+				raf.seek(offsetPrevPrev); 
+				raf.read(payload, 0, lengthPayload);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException ioe) {
+				ioe.printStackTrace();
+			}
+			
+			
+			return FSReturnVals.Success;
+			
+		}
 	}
 
 }
