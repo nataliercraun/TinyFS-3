@@ -108,7 +108,7 @@ public class ClientFS {
 	 * Example usage: OpenFile("/Shahram/CSCI485/Lecture1/Intro.pptx", FH1)
 	 */
 	public FSReturnVals OpenFile(String FilePath, FileHandle ofh) {
-		List<String> chunks = master.openFile(FilePath); //master function returns null if file doesnt exist
+		List<String> chunks = master.openFile(FilePath, ofh); //master function returns null if file doesnt exist
 		
 		if (chunks == null) {
 			return FSReturnVals.FileDoesNotExist;
@@ -125,7 +125,7 @@ public class ClientFS {
 	 * Example usage: CloseFile(FH1)
 	 */
 	public FSReturnVals CloseFile(FileHandle ofh) {
-		return null;
+		return master.CloseFile(ofh);
 	}
 
 }

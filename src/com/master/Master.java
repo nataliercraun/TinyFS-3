@@ -38,14 +38,15 @@ public class Master {
 				return FSReturnVals.FileExists;
 			}
 		}
+		String absPath = tgt + filename;
 		System.out.println("hell0 from createfile");
-		toAdd = new TinyFsFile(filename);
+		toAdd = new TinyFsFile(filename, absPath);
 		toAdd2 = new FileHandle();
 		System.out.println("toadd" + toAdd.name);
 		targetDir.files.add(toAdd);
 		System.out.println("hell00 from createfile");
 		//Adding file to files map in master
-		String absPath = tgt + filename;
+		
 		System.out.println("abs path: " + absPath);
 		
 		toAdd2.setFP(absPath); //adding abspath to Filehandle
@@ -77,6 +78,7 @@ public class Master {
 		//Removing file from files map in master
 		String absPath = tgt + filename;
 		files.remove(absPath);
+		fileHandles.remove(absPath);
 		return FSReturnVals.Success;	
 	}
 	
@@ -173,11 +175,17 @@ public class Master {
 		return FSReturnVals.Success;
 	}
 	
-	public List<String> openFile(String filePath) {
+	public List<String> openFile(String filePath, FileHandle ofh) {
 		TinyFsFile file = files.get(filePath);
 		if (file == null) {
 			return null;
 		}
+		FileHandle fh = fileHandles.get(filePath);
+		ofh.setFP(fh.getFP());
+		ofh.setHandles(fh.getHandles());
+		ofh.setOpen(true);
+		fileHandles.remove(filePath);
+		fileHandles.put(filePath, ofh);
 		return file.getChunkHandles();
 	}
 	public FSReturnVals CloseFile(FileHandle fh) {
@@ -195,7 +203,7 @@ public class Master {
 		return FSReturnVals.BadHandle;
 	}
 	
-	private String getEndOfPath(String srcDir) { //TODO: 
+	private String getEndOfPath(String srcDir) {  
 		if (srcDir.equals("/")) {
 			return "/";
 		}

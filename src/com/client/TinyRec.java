@@ -4,6 +4,14 @@ public class TinyRec {
 	private byte[] payload = null;
 	private RID ID = null;
 	
+	public TinyRec(byte[] payload, RID ID) {
+		this.payload = payload;
+		this.ID = new RID();
+	}
+	public TinyRec() {
+		
+	}
+
 	public byte[] getPayload() {
 		return payload;
 	}

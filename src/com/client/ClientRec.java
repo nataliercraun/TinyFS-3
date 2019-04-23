@@ -4,13 +4,15 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.client.ClientFS.FSReturnVals;
 
 public class ClientRec {
 
-	static final int MAX_CHUNK_SIZE = 4096;
+	static final int MAX_CHUNK_SIZE = 1024*1024;
 	
 	/**
 	 * Appends a record to the open file as specified by ofh Returns BadHandle
@@ -39,9 +41,10 @@ public class ClientRec {
 		byte[] newRecordNumber = ByteBuffer.allocate(4).putInt(numberRecords + 1).array();
 		byte[] newRecordOffset = ByteBuffer.allocate(4).putInt(payload.length+offsetLastRecord).array();
 		
+				
 		RandomAccessFile raf = null;
 		try {
-			raf = new RandomAccessFile(lastChunkHandle, "rw");
+			raf = new RandomAccessFile(getEndOfPath(lastChunkHandle), "rw"); //TODO: changed it to getendofpath instead of abspath
 		} catch(FileNotFoundException fnfe) {
 			fnfe.printStackTrace();
 		}
@@ -70,7 +73,7 @@ public class ClientRec {
 		
 		RandomAccessFile raf = null;
 		try {
-			raf = new RandomAccessFile(newChunkHandle,"rw");
+			raf = new RandomAccessFile(getEndOfPath(newChunkHandle),"rw"); //TODO: 
 			raf.setLength((long) MAX_CHUNK_SIZE);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -99,7 +102,7 @@ public class ClientRec {
 	private int getOffsetOfRecord(String chunkHandle, int recordNumber) {
 		RandomAccessFile raf = null;
 		try {
-			raf = new RandomAccessFile(chunkHandle,"rw");
+			raf = new RandomAccessFile(getEndOfPath(chunkHandle),"rw"); //TODO: 
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -119,7 +122,7 @@ public class ClientRec {
 	private int getNumberRecords(String chunkHandle) {
 		RandomAccessFile raf = null;
 		try {
-			raf = new RandomAccessFile(chunkHandle, "r");
+			raf = new RandomAccessFile(getEndOfPath(chunkHandle), "r"); //TODO: 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -159,7 +162,7 @@ public class ClientRec {
 		
 		RandomAccessFile raf = null;
 		try {
-			raf = new RandomAccessFile(chunkHandle,"rw");
+			raf = new RandomAccessFile(getEndOfPath(chunkHandle),"rw"); //TODO: 
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -199,7 +202,7 @@ public class ClientRec {
 		
 		String firstChunkHandle = "";
 		// get the right chunkhandle
-		if (ofh.getHandles().size() > 0) {
+		if (ofh.chunkHandles.size() > 0) {
 			firstChunkHandle = ofh.getHandles().get(0);
 		} else {
 			// file is empty 
@@ -210,7 +213,7 @@ public class ClientRec {
 		byte[] payload = null;
 		
 		try {
-			raf = new RandomAccessFile(firstChunkHandle, "rw");
+			raf = new RandomAccessFile(getEndOfPath(firstChunkHandle), "rw"); //TODO: 
 		} catch(FileNotFoundException fnfe) {
 			fnfe.printStackTrace();
 		}
@@ -284,7 +287,7 @@ public class ClientRec {
 		
 		RandomAccessFile raf = null;
 		try {
-			raf = new RandomAccessFile(lastChunkHandle, "r");
+			raf = new RandomAccessFile(getEndOfPath(lastChunkHandle), "r"); //TODO:
 		} catch(FileNotFoundException fnfe) {
 			fnfe.printStackTrace();
 		}
@@ -339,6 +342,8 @@ public class ClientRec {
 					}
 					else {
 						chunkHandle = chunkHandles.get(i+1);
+						currentIndex = 0;
+						break;
 					}
 				}
 			}
@@ -370,14 +375,19 @@ public class ClientRec {
 		}
 		else {
 			int	prevRecordOffset = getOffsetOfRecord(chunkHandle, index);
+			if(prevRecordOffset < 0) {
+				prevRecordOffset = -prevRecordOffset;
+			}
 			int currRecordOffset = getOffsetOfRecord(chunkHandle, index+1);
 			payloadSize = currRecordOffset - prevRecordOffset;
 			startOfPayload = prevRecordOffset;
 		}
 		
+		
+		
 		RandomAccessFile raf = null;
 		try {
-			raf = new RandomAccessFile(chunkHandle, "r");
+			raf = new RandomAccessFile(getEndOfPath(chunkHandle), "r"); //TODO:
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -419,12 +429,11 @@ public class ClientRec {
 						chunkHandle = chunkHandles.get(i-1);
 						int numberRecords = getNumberRecords(chunkHandle);
 						currentIndex = numberRecords - 1;
+						break;
 					}
 				}
 			}
-		}
-		
-		
+		}		
 		
 		int currentOffset = getOffsetOfRecord(chunkHandle, currentIndex+1);
 		//If current record is invalid (has been deleted) call get next record again
@@ -442,4 +451,15 @@ public class ClientRec {
 		return FSReturnVals.Success;
 	}
 
+	private String getEndOfPath(String srcDir) {  
+		if (srcDir.equals("/")) {
+			return "/";
+		}
+		
+		String[] partsArr = srcDir.split("/");
+		
+		ArrayList<String> parts = new ArrayList<>(Arrays.asList(partsArr));
+		
+		return parts.get(parts.size()-1);
+	}
 }
