@@ -328,8 +328,8 @@ public class ClientRec {
 		int currentIndex = pivot.index + 1;
 		String chunkHandle = pivot.ChunkHandle;
 		int numberRecords = getNumberRecords(chunkHandle);
-		//If already at beginning of chunk, set chunkHandle to prev chunk or return RecDoesNotExist
-		//if already at first chunk of file
+		
+		//If already at last index of last chunk for pivot, return rec does not exist since at end of file
 		if ( (currentIndex+1) > numberRecords) {
 			List<String> chunkHandles = ofh.getHandles();
 			for (int i = 0; i < chunkHandles.size(); i++) {
@@ -404,41 +404,42 @@ public class ClientRec {
 	 * recn-1, tinyRec2) 3. ReadPrevRecord(FH1, recn-2, tinyRec3)
 	 */
 	public FSReturnVals ReadPrevRecord(FileHandle ofh, RID pivot, TinyRec rec){
-		if (pivot.ChunkHandle == ofh.getHandles().get(0) && (pivot.index == 0)) {
-			return FSReturnVals.RecDoesNotExist;
-		}  else {
-			// Calculate payload length 
-			RandomAccessFile raf = null;
-			
-			int offsetPrev = getOffsetOfRecord(pivot.ChunkHandle, pivot.index); //index+1 would be location of pivot
-			int offsetPrevPrev = getOffsetOfRecord(pivot.ChunkHandle, pivot.index-1);
-			
-			if (offsetPrevPrev < 4) {
-				return FSReturnVals.RecDoesNotExist;
-			} 
-			
-			if (offsetPrev < 0) {
-				pivot.index -= 1; 
-				return ReadPrevRecord(ofh, pivot, rec);
+		int currentIndex = pivot.index - 1;
+		String chunkHandle = pivot.ChunkHandle;
+		
+		//If already at last index of last chunk for pivot, return rec does not exist since at end of file
+		if ( (currentIndex-1) < 0) {
+			List<String> chunkHandles = ofh.getHandles();
+			for (int i = 0; i < chunkHandles.size(); i++) {
+				if (chunkHandles.get(i).equals(chunkHandle)) {
+					if (i == 0) {
+						return FSReturnVals.RecDoesNotExist;
+					}
+					else {
+						chunkHandle = chunkHandles.get(i-1);
+						int numberRecords = getNumberRecords(chunkHandle);
+						currentIndex = numberRecords - 1;
+					}
+				}
 			}
-			
-			int lengthPayload = offsetPrev - offsetPrevPrev;
-			byte[] payload = new byte[lengthPayload]; 
-			
-			
-			try {
-				raf = new RandomAccessFile(pivot.ChunkHandle, "rw");
-				raf.seek(offsetPrevPrev); 
-				raf.read(payload, 0, lengthPayload);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException ioe) {
-				ioe.printStackTrace();
-			}
-			
-			return FSReturnVals.Success;
-			
 		}
+		
+		
+		
+		int currentOffset = getOffsetOfRecord(chunkHandle, currentIndex+1);
+		//If current record is invalid (has been deleted) call get next record again
+		if (currentOffset < 0) {
+			pivot.ChunkHandle = chunkHandle;
+			pivot.index = currentIndex;
+			return ReadPrevRecord(ofh, pivot, rec);
+		}
+		
+		rec.setPayload(getRecordPayload(chunkHandle, currentIndex));
+		RID r = new RID();
+		r.index = currentIndex;
+		r.ChunkHandle = chunkHandle;
+		rec.setRID(r);
+		return FSReturnVals.Success;
 	}
 
 }
