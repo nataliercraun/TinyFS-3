@@ -168,10 +168,19 @@ public class ClientRec {
 		try {
 			raf.seek(MAX_CHUNK_SIZE - 4*(index+1));
 			raf.read(recordOffset, 0, 4);
-			int newInvalidOffset = ByteBuffer.wrap(recordOffset).getInt()*(-1);
+			int recOffsetInt = ByteBuffer.wrap(recordOffset).getInt();
+			
+			//If offset already negative, means record has already been deleted and does not exist
+			if (recOffsetInt < 0) {
+				raf.close();
+				return FSReturnVals.RecDoesNotExist;
+			}
+			
+			int newInvalidOffset = recOffsetInt*(-1);
 			byte[] newInvalidRecordOffset = ByteBuffer.allocate(4).putInt(newInvalidOffset).array();
 			raf.seek(MAX_CHUNK_SIZE - 4*(index+1));
 			raf.write(newInvalidRecordOffset, 0, newInvalidRecordOffset.length);
+			raf.close();
 		} catch (IOException ioe){
 			ioe.printStackTrace();
 		}
