@@ -25,7 +25,7 @@ public class Master {
 	}
 	
 	public FSReturnVals createFile(String tgt, String filename) {
-
+		System.out.println("hell from createfile");
 		TinyFsDir targetDir = directories.get(tgt.substring(0, tgt.length() - 1));
 		if (targetDir == null) {
 			return FSReturnVals.SrcDirNotExistent;
@@ -38,20 +38,20 @@ public class Master {
 				return FSReturnVals.FileExists;
 			}
 		}
-		
+		System.out.println("hell0 from createfile");
 		toAdd = new TinyFsFile(filename);
+		toAdd2 = new FileHandle();
 		System.out.println("toadd" + toAdd.name);
 		targetDir.files.add(toAdd);
-
+		System.out.println("hell00 from createfile");
 		//Adding file to files map in master
 		String absPath = tgt + filename;
 		System.out.println("abs path: " + absPath);
 		
 		toAdd2.setFP(absPath); //adding abspath to Filehandle
-
+		System.out.println("hell000 from createfile");
 		files.put(absPath, toAdd);
 		fileHandles.put(absPath, toAdd2); //adding filehandle into filehandle map
-		
 		return FSReturnVals.Success;	
 	}
 	
