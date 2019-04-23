@@ -144,7 +144,39 @@ public class ClientRec {
 	 * Example usage: DeleteRecord(FH1, RecID1)
 	 */
 	public FSReturnVals DeleteRecord(FileHandle ofh, RID RecordID) {
-		return null;
+		String chunkHandle = RecordID.ChunkHandle;
+		int index = RecordID.index;
+		List<String> chunkHandles = ofh.chunkHandles;
+		
+		if (!chunkHandles.contains(chunkHandle)) {
+			return FSReturnVals.BadHandle;
+		}
+		
+		int numberRecords = getNumberRecords(chunkHandle);
+		if (index > (numberRecords-1)) {
+			return FSReturnVals.RecDoesNotExist;
+		}
+		
+		RandomAccessFile raf = null;
+		try {
+			raf = new RandomAccessFile(chunkHandle,"rw");
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		byte[] recordOffset = new byte[4];
+		try {
+			raf.seek(MAX_CHUNK_SIZE - 4*(index+1));
+			raf.read(recordOffset, 0, 4);
+			int newInvalidOffset = ByteBuffer.wrap(recordOffset).getInt()*(-1);
+			byte[] newInvalidRecordOffset = ByteBuffer.allocate(4).putInt(newInvalidOffset).array();
+			raf.seek(MAX_CHUNK_SIZE - 4*(index+1));
+			raf.write(newInvalidRecordOffset, 0, newInvalidRecordOffset.length);
+		} catch (IOException ioe){
+			ioe.printStackTrace();
+		}
+		
+		return FSReturnVals.Success;
 	}
 
 	/**
@@ -176,7 +208,74 @@ public class ClientRec {
 	 * rec1, tinyRec2) 3. ReadNextRecord(FH1, rec2, tinyRec3)
 	 */
 	public FSReturnVals ReadNextRecord(FileHandle ofh, RID pivot, TinyRec rec){
-		return null;
+		int currentIndex = pivot.index + 1;
+		String chunkHandle = pivot.ChunkHandle;
+		int numberRecords = getNumberRecords(chunkHandle);
+		//If already at beginning of chunk, set chunkHandle to prev chunk or return RecDoesNotExist
+		//if already at first chunk of file
+		if ( (currentIndex+1) > numberRecords) {
+			List<String> chunkHandles = ofh.getHandles();
+			for (int i = 0; i < chunkHandles.size(); i++) {
+				if (chunkHandles.get(i).equals(chunkHandle)) {
+					if (i == (chunkHandles.size()-1)) {
+						return FSReturnVals.RecDoesNotExist;
+					}
+					else {
+						chunkHandle = chunkHandles.get(i+1);
+					}
+				}
+			}
+		}
+		
+		int currentOffset = getOffsetOfRecord(chunkHandle, currentIndex+1);
+		//If current record is invalid (has been deleted) call get next record again
+		if (currentOffset < 0) {
+			pivot.ChunkHandle = chunkHandle;
+			pivot.index = currentIndex;
+			return ReadNextRecord(ofh, pivot, rec);
+		}
+		
+		rec.setPayload(getRecordPayload(chunkHandle, currentIndex));
+		RID r = new RID();
+		r.index = currentIndex;
+		r.ChunkHandle = chunkHandle;
+		rec.setRID(r);
+		return FSReturnVals.Success;
+	}
+	
+	private byte[] getRecordPayload(String chunkHandle, int index) {
+		
+		int payloadSize;
+		int startOfPayload;
+		if (index == 0) {
+			startOfPayload = 4;
+			payloadSize = getOffsetOfRecord(chunkHandle, index+1) - 4;
+		}
+		else {
+			int	prevRecordOffset = getOffsetOfRecord(chunkHandle, index);
+			int currRecordOffset = getOffsetOfRecord(chunkHandle, index+1);
+			payloadSize = currRecordOffset - prevRecordOffset;
+			startOfPayload = prevRecordOffset;
+		}
+		
+		RandomAccessFile raf = null;
+		try {
+			raf = new RandomAccessFile(chunkHandle, "r");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		byte[] payload = new byte[payloadSize];
+		try {
+			raf.seek(startOfPayload);
+			raf.read(payload, 0, payloadSize);
+			raf.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		
+		return payload;
+		
 	}
 
 	/**
