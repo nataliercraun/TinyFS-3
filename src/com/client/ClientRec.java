@@ -265,7 +265,55 @@ public class ClientRec {
 	 * Example usage: ReadLastRecord(FH1, tinyRec)
 	 */
 	public FSReturnVals ReadLastRecord(FileHandle ofh, TinyRec rec){
-		return null;
+		
+		//check badhandle
+		//check recdoesnotexist
+		
+		
+		List<String> chunkHandles = ofh.getHandles(); 
+		String lastChunkHandle = chunkHandles.get(chunkHandles.size()-1);
+		int numberRecords = getNumberRecords(lastChunkHandle);
+		int offsetLastRecord = getOffsetOfRecord(lastChunkHandle, numberRecords);
+		int offsetPrevRecord = getOffsetOfRecord(lastChunkHandle,numberRecords-1);
+		
+		if(offsetPrevRecord < 0) {
+			offsetPrevRecord = -offsetPrevRecord;
+		}
+		int length_payload = offsetLastRecord - offsetPrevRecord;
+		byte[] data = new byte[length_payload];
+		
+		RandomAccessFile raf = null;
+		try {
+			raf = new RandomAccessFile(lastChunkHandle, "r");
+		} catch(FileNotFoundException fnfe) {
+			fnfe.printStackTrace();
+		}
+		try {
+			
+			raf.seek(MAX_CHUNK_SIZE - numberRecords*4); //
+			//if that's negative then need to call prevrecord
+			byte[] endof = new byte[4];
+			raf.read(endof, 0, 4);
+			int endofint = ByteBuffer.wrap(endof).getInt();
+			if(endofint < 0) {
+				RID pivot_rid = new RID(lastChunkHandle, numberRecords-1);
+				return ReadPrevRecord(ofh, pivot_rid, rec); 
+			}
+			
+			raf.seek(offsetPrevRecord);
+			raf.read(data, 0, length_payload);
+			raf.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		rec.setPayload(data);
+		RID rid = new RID();
+		rid.ChunkHandle = lastChunkHandle;
+		rid.index = numberRecords;
+		rec.setRID(rid);
+		
+		return FSReturnVals.Success;
 	}
 
 	/**
